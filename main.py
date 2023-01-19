@@ -164,7 +164,6 @@ async def on_voice_state_update(member, before, after):
         if len(before.channel.members) == 1:
             #if there's another channel with members in it, join the one with the most members in it, if there's only empty channels, disconnect
             #get the voice channels the bot is in
-            before.
             voiceChannels = [x for x in before.channel.guild.channels if type(x) == discord.channel.VoiceChannel]
             #get the voice channel with the most members
             channel = max(voiceChannels, key=lambda x: len(x.members))
