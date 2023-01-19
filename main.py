@@ -52,7 +52,41 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
 
 #create a function to play a sound
 async def playSound(member):
-    #2 procent chance of playing "arg.mp3"
+
+    #get the sound files in the sounds folder
+    soundfiles = [x for x in os.listdir("sounds") if x.endswith(".mp3")]
+    
+    #get the id of the member and compare it to the names of the mp3 files
+    for x in soundfiles:
+        #if the id of the member is in the name of the mp3 file
+        if str(member.id) in x:
+            #build a path to the sound file
+            path = "sounds/" + x
+            #play the sound with high volume
+
+            
+            member.guild.voice_client.play(discord.FFmpegPCMAudio(path))
+            
+            #wait for the sound to finish
+            while member.guild.voice_client.is_playing():
+                await asyncio.sleep(1)
+            #stop the loop
+            break
+    else:
+        #get sound files in the sounds/generic folder
+        soundfiles = [x for x in os.listdir("sounds/generic") if x.endswith(".mp3")]
+        #get a random sound file
+        soundfile = random.choice(soundfiles)
+        #build a path to the sound file
+        path = "sounds/generic/" + soundfile
+        #play the sound with high volume
+        member.guild.voice_client.play(discord.FFmpegPCMAudio(path))
+        #wait for the sound to finish
+        while member.guild.voice_client.is_playing():
+            await asyncio.sleep(1)
+
+
+    """#2 procent chance of playing "arg.mp3"
     number = random.randint(1,100)
     print(number)
     if number <= 10:
@@ -73,7 +107,7 @@ async def playSound(member):
         member.guild.voice_client.play(discord.FFmpegPCMAudio("final.mp3"))
         #wait for the sound to finish
         while member.guild.voice_client.is_playing():
-            await asyncio.sleep(1)
+            await asyncio.sleep(1)"""
     
 
 # Bot Startup
@@ -86,7 +120,8 @@ async def on_ready():
         #start the loop
         send_message.start()
     
-        
+    
+    
     #See if there's a voice channel with members in it, if there are several join the one with most members in it
     #get the voice channels the bot is in
     voiceChannels = [x for x in bot.guilds[0].channels if type(x) == discord.channel.VoiceChannel]
@@ -100,11 +135,8 @@ async def on_ready():
     else:
         #join the voice channel with the most members
         vc = await channel.connect()
-        #play the sound
-        vc.play(discord.FFmpegPCMAudio("final.mp3"))
-        #wait for the sound to finish
-        while vc.is_playing():
-            await asyncio.sleep(1)
+        playInjections.start()
+        
     
     
 andreas = 134427081672097793
@@ -113,13 +145,13 @@ andreas = 134427081672097793
 @bot.event
 async def on_voice_state_update(member, before, after):
 
+    await asyncio.sleep(2)
     #if the state update is not from switching or joining a voice channel do nothing
     if before.channel == after.channel:
         return
 
-    #If the member is a bot do nothing
-    if member.bot:
-        return
+    #if the bot was not in a voice channel before and is now in a voice channel
+    
     
     #if the member leaves a voice channel
     if before.channel != None and after.channel == None:
@@ -149,8 +181,8 @@ async def on_voice_state_update(member, before, after):
             #do nothing
             pass
 
-    if member.id == andreas:
-        return
+    #if member.id == andreas:
+     #   return
 
 
             
@@ -199,6 +231,17 @@ async def on_voice_state_update(member, before, after):
                 vc = await after.channel.connect()
                 #play the sound
                 await playSound(member)
+    
+    if after.channel != None:
+    #if the bot is in the same voice channel as it was before and after the state update
+        if bot.user in before.channel.members and bot.user in after.channel.members:
+            #do nothing
+            pass
+        else:
+            #if bot is in a voice channel
+            if bot.user in after.channel.members:
+                playInjections.start()
+
         
 
 #send a message to a specific channel every five minutes
@@ -260,7 +303,36 @@ async def on_message_edit(before, after):
         await botmessage.delete()
 
 
-
+#loop every 3 to 5 minutes
+@discord_tasks.loop(minutes=3)
+async def playInjections():
+    chatt46 = 675457564586147840
+    
+    #get the guild with the id 675457564586147840
+    guild = bot.get_guild(chatt46)
+    #check if the bot is in a voice channel in that guild
+    if guild.voice_client != None:
+        #get the voice channel the bot is in
+        channel = guild.voice_client.channel
+        
+        #put all the sounds in sounds/injections in a list
+        sounds = []
+        for file in os.listdir("sounds/injections"):
+            sounds.append(file)
+        #get a random sound from the list
+        sound = random.choice(sounds)
+        #build a path to the file
+        path = "sounds/injections/" + sound
+        #play the sound
+        #get the current voice client
+        vc = guild.voice_client
+        #play the sound
+        vc.play(discord.FFmpegPCMAudio(path))
+        #wait for the sound to finish
+        while vc.is_playing():
+            await asyncio.sleep(1)
+    else:
+        return
 
 
 #run the bot
