@@ -198,7 +198,20 @@ async def on_message_delete(message):
         await botmessage.delete()
         
 
-
+#On message edit
+@bot.event
+async def on_message_edit(before, after):
+    #if the message is from a bot do nothing
+    if before.author.bot:
+        return
+    #if the message is not from a bot
+    else:
+        #send a message in the same channel as the edited message mentioning the author of the edited message and calling them out
+        botmessage = await before.channel.send("HAHAHAHAH" + before.author.mention + " KAN INTE SKRIVA")
+        #delete the message after 5 seconds
+        await asyncio.sleep(5)
+        #delete all messages the bot has sent in the channel
+        await botmessage.delete()
 
 
 
