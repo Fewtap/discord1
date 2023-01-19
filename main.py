@@ -207,7 +207,7 @@ async def on_voice_state_update(member, before, after):
         
         
         #if the bot is not in a voice channel
-        if bot.user not in before.channel.members:
+        if bot.user not in after.channel.members:
             #join the voice channel the member is in
             vc = await after.channel.connect()
             #play the sound
@@ -322,33 +322,30 @@ async def on_message_edit(before, after):
 @discord_tasks.loop(minutes=3)
 async def playInjections():
     print("Running injections loop")
-    chatt46 = 675457564586147840
-    
-    #get the guild with the id 675457564586147840
-    guild = bot.get_guild(chatt46)
-    #check if the bot is in a voice channel in that guild
-    if guild.voice_client != None:
-        #get the voice channel the bot is in
-        channel = guild.voice_client.channel
-        
-        #put all the sounds in sounds/injections in a list
-        sounds = []
-        for file in os.listdir("sounds/injections"):
-            sounds.append(file)
-        #get a random sound from the list
-        sound = random.choice(sounds)
-        #build a path to the file
-        path = "sounds/injections/" + sound
-        #play the sound
-        #get the current voice client
-        vc = guild.voice_client
-        #play the sound
-        vc.play(discord.FFmpegPCMAudio(path))
-        #wait for the sound to finish
-        while vc.is_playing():
-            await asyncio.sleep(1)
-    else:
-        return
+    injections = os.listdir("sounds/injections")
+    for guild in bot.guilds:
+        #check if the bot is in a voice channel
+        if guild.voice_client != None:
+            #check if the bot is in a voice channel with members
+            if len(guild.voice_client.channel.members) > 1:
+                #get the voice channel the bot is in
+                channel = guild.voice_client.channel
+                #get the members in the voice channel
+                members = channel.members
+                #get a random member from the members in the voice channel
+                member = random.choice(members)
+
+#build a path to the sound file
+                path = "sounds/injections/" + random.choice(injections)
+
+                #play the sound
+                guild.voice_client.play(discord.FFmpegPCMAudio(path))
+                #wait for the sound to finish
+                while guild.voice_client.is_playing():
+                    await asyncio.sleep(1)
+            else:
+                #if the bot is in a voice channel with no members disconnect
+                await guild.voice_client.disconnect()
 
 #create a command called debate
 @bot.command()
