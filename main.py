@@ -52,14 +52,29 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
 
 #create a function to play a sound
 async def playSound(member):
-    try:
+    #2 procent chance of playing "arg.mp3"
+    number = random.randint(1,100)
+    print(number)
+    if number <= 10:
+        #play the sound
+        member.guild.voice_client.play(discord.FFmpegPCMAudio("arg.mp3"))
+        #wait for the sound to finish
+        while member.guild.voice_client.is_playing():
+            await asyncio.sleep(1)
+    #if number is between 10 and 30
+    elif number > 10 and number <= 30:
+        #play the sound
+        member.guild.voice_client.play(discord.FFmpegPCMAudio("eww.mp3"))
+        #wait for the sound to finish
+        while member.guild.voice_client.is_playing():
+            await asyncio.sleep(1)
+    else:
         #play the sound
         member.guild.voice_client.play(discord.FFmpegPCMAudio("final.mp3"))
         #wait for the sound to finish
         while member.guild.voice_client.is_playing():
-           await asyncio.sleep(1)
-    except Exception as e:
-        print("Error: " + str(e))
+            await asyncio.sleep(1)
+    
 
 # Bot Startup
 @bot.event
@@ -125,7 +140,7 @@ async def on_voice_state_update(member, before, after):
                 #join the voice channel with the most members
                 vc = await channel.connect()
                 #play the sound
-                vc.play(discord.FFmpegPCMAudio("final.mp3"))
+                await playSound(member)
                 #wait for the sound to finish
                 while vc.is_playing():
                     await asyncio.sleep(1)
@@ -158,10 +173,8 @@ async def on_voice_state_update(member, before, after):
                 await before.channel.guild.voice_client.disconnect()
                 vc = await after.channel.connect()
                 #play the sound
-                vc.play(discord.FFmpegPCMAudio("final.mp3"))
-                #wait for the sound to finish
-                while vc.is_playing():
-                    await asyncio.sleep(1)
+                await playSound(member)
+                
 
     #if the member switches voice channels
     if before.channel != None and after.channel != None:
@@ -177,19 +190,15 @@ async def on_voice_state_update(member, before, after):
                 await before.channel.guild.voice_client.disconnect()
                 vc = await after.channel.connect()
                 #play the sound
-                vc.play(discord.FFmpegPCMAudio("final.mp3"))
+                await playSound(member)
                 #wait for the sound to finish
-                while vc.is_playing():
-                    await asyncio.sleep(1)
+                
             #else if only the bot is left in the voice channel the bot is in, disconnect and join the voice channel the member is in
             elif len(before.channel.members) == 1:
                 await before.channel.guild.voice_client.disconnect()
                 vc = await after.channel.connect()
                 #play the sound
-                vc.play(discord.FFmpegPCMAudio("final.mp3"))
-                #wait for the sound to finish
-                while vc.is_playing():
-                    await asyncio.sleep(1)
+                await playSound(member)
         
 
 #send a message to a specific channel every five minutes
