@@ -1,3 +1,7 @@
+import datetime
+import threading
+
+
 try:
     import discord
     from discord.ext import commands
@@ -21,6 +25,9 @@ finally:
     import os
     import sys
 
+
+
+
 token = ''
 
 
@@ -34,12 +41,15 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
 
 
 #create a function to play a sound
-def playSound(member):
-    #play the sound
-    member.guild.voice_client.play(discord.FFmpegPCMAudio("final.mp3"))
-    #wait for the sound to finish
-    while member.guild.voice_client.is_playing():
-        asyncio.sleep(1)
+async def playSound(member):
+    try:
+        #play the sound
+        member.guild.voice_client.play(discord.FFmpegPCMAudio("final.mp3"))
+        #wait for the sound to finish
+        while member.guild.voice_client.is_playing():
+           await asyncio.sleep(1)
+    except Exception as e:
+        print("Error: " + str(e))
 
 # Bot Startup
 @bot.event
@@ -65,10 +75,10 @@ async def on_ready():
         vc.play(discord.FFmpegPCMAudio("final.mp3"))
         #wait for the sound to finish
         while vc.is_playing():
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
     
     
-
+andreas = 134427081672097793
 
 #On voice state update
 @bot.event
@@ -76,90 +86,97 @@ async def on_voice_state_update(member, before, after):
     #If the member is a bot do nothing
     if member.bot:
         return
-
-
-    #If user joins a voice channel
-    if before.channel is None and after.channel is not None:
-        #If theh bot is already in a voice channel and the user joins the voice channel the bot is in
-        if member.guild.voice_client is not None and member.guild.voice_client.channel == after.channel:
-            #play the sound
-            playSound(member)
-        #If the bot is not in a voice channel already, join the voice channel
-        if member.guild.voice_client is None:
-            channel = after.channel
-            vc = await channel.connect()
-            #play the sound
-            playSound(member)
-        #If the bot is in a voice channel already, and there's less members in the new voice channel than the current voice channel, join the new voice channel
-        elif member.guild.voice_client is not None:
-            if len(after.channel.members) > len(member.guild.voice_client.channel.members):
-                pass
+    
+    #if the member leaves a voice channel
+    if before.channel != None and after.channel == None:
+        
+        #if there's no one left in the voice channel
+        if len(before.channel.members) == 1:
+            #if there's another channel with members in it, join the one with the most members in it, if there's only empty channels, disconnect
+            #get the voice channels the bot is in
+            voiceChannels = [x for x in bot.guilds[0].channels if type(x) == discord.channel.VoiceChannel]
+            #get the voice channel with the most members
+            channel = max(voiceChannels, key=lambda x: len(x.members))
+            #if the bot is in the voice channel with the most members
+            if bot.user in channel.members:
+                #disconnect
+                await before.channel.guild.voice_client.disconnect()
+            #if the bot is not in the voice channel with the most members
             else:
-                #leave the current voice channel
-                await member.guild.voice_client.disconnect()
-                #join the new voice channel
-                channel = after.channel
+                #join the voice channel with the most members
                 vc = await channel.connect()
                 #play the sound
-                playSound(member)
-
-
-    #If user leaves a voice channel
-    elif before.channel is not None and after.channel is None:
-        #if the bot is the only one in the voice channel
-        if len(before.channel.members) == 1:
-            #leave the voice channel
-            await before.channel.guild.voice_client.disconnect()
-            #If there are memebers in another voice channel join the one with the most members
+                vc.play(discord.FFmpegPCMAudio("final.mp3"))
+                #wait for the sound to finish
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+        #if there's someone left in the voice channel
         else:
-            #get the voice channels the bot is in
-            voiceChannels = [x for x in member.guild.channels if type(x) == discord.channel.VoiceChannel]
-            #get the voice channel with the most members
-            channel = max(voiceChannels, key=lambda x: len(x.members))
-            #if the bot is in the voice channel with the most members
-            if bot.user in channel.members:
-                #do nothing
-                pass
-            #if the bot is not in the voice channel with the most members
+            #do nothing
+            pass
+
+    if member.id == andreas:
+        return
+
+
+            
+
+
+
+    #if the member joins a voice channel
+    if before.channel == None and after.channel != None:
+        #if the member is andreas
+        if member.id == andreas:
+            return
+        #if the member is not andreas
+        else:
+            #if the bot is in the same voice channel as the member
+            if bot.user in after.channel.members:
+                #play the sound
+                await playSound(member)
             else:
-                #join the voice channel with the most members
-                vc = await channel.connect()
-                playSound(member)
+                #disconnect and join the voice channel the member is in
+                await before.channel.guild.voice_client.disconnect()
+                vc = await after.channel.connect()
+                #play the sound
+                vc.play(discord.FFmpegPCMAudio("final.mp3"))
+                #wait for the sound to finish
+                while vc.is_playing():
+                    await asyncio.sleep(1)
 
-
-    #If user switches voice channels
-    elif before.channel is not None and after.channel is not None:
-        #if the bot is the only one in the voice channel
-        if len(before.channel.members) == 1:
-            #leave the voice channel
-            await before.channel.guild.voice_client.disconnect()
-            #If there are memebers in another voice channel join the one with the most members
-        
-            #get the voice channels the bot is in
-            voiceChannels = [x for x in member.guild.channels if type(x) == discord.channel.VoiceChannel]
-            #get the voice channel with the most members
-            channel = max(voiceChannels, key=lambda x: len(x.members))
-            #if the bot is in the voice channel with the most members
-            if bot.user in channel.members:
-                #do nothing
-                pass
-            #if the bot is not in the voice channel with the most members
-            else:
-                #join the voice channel with the most members
-                vc = await channel.connect()
-                playSound(member)
-        
-
-        #if there are less members in the new voice channel than the current voice channel
-        if len(after.channel.members) < len(before.channel.members):
-            #leave the current voice channel
-            await before.channel.guild.voice_client.disconnect()
-            #join the new voice channel
-            channel = after.channel
-            vc = await channel.connect()
+    #if the member switches voice channels
+    if before.channel != None and after.channel != None:
+        if member.id == andreas:
+            return
+        #if the bot is in the same voice channel as the member
+        if bot.user in after.channel.members:
             #play the sound
-            playSound(member)
+            await playSound(member)
+        else:
+            #if there's is less members in the voice channel the member is in than the voice channel the bot is in disconnect and join the voice channel the member is in
+            if len(after.channel.members) < len(before.channel.members):
+                await before.channel.guild.voice_client.disconnect()
+                vc = await after.channel.connect()
+                #play the sound
+                vc.play(discord.FFmpegPCMAudio("final.mp3"))
+                #wait for the sound to finish
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+            #else if only the bot is left in the voice channel the bot is in, disconnect and join the voice channel the member is in
+            elif len(before.channel.members) == 1:
+                await before.channel.guild.voice_client.disconnect()
+                vc = await after.channel.connect()
+                #play the sound
+                vc.play(discord.FFmpegPCMAudio("final.mp3"))
+                #wait for the sound to finish
+                while vc.is_playing():
+                    await asyncio.sleep(1)
         
+
+
+
+
+
 
 
 
