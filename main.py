@@ -7,7 +7,7 @@ from discord.ext import tasks as discord_tasks
 #init reddit
 reddit = praw.Reddit(client_id='ej-ZEwtd6hUmvrV4nRqPHg', client_secret='UAkc21N6qnsnF9hU2ZAYk9MFIVmbDA', user_agent='your bot 0.1 by /u/your_bot')
 
-mejmejs = False
+mejmejs = True
 
 
 try:
@@ -193,10 +193,10 @@ async def on_voice_state_update(member, before, after):
         
 
 #send a message to a specific channel every five minutes
-@discord_tasks.loop(minutes=60)
+@discord_tasks.loop(minutes=10)
 async def send_message():
     #get the channel
-    channel = bot.get_channel(675461229015203861)
+    channel = bot.get_channel(1065645686697246810)
     #get the 10 image posts from r/unket and put them in a list
     posts = []
     for submission in reddit.subreddit("unket").hot(limit=10):
@@ -214,7 +214,8 @@ async def send_message():
         post = random.choice(posts)
 
     #send the post.url in the channel
-    await channel.send(post.title +  " " + post.url)
+    
+    await channel.send(post.title + "\n" + post.url)
     
 
 
