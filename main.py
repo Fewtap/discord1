@@ -135,8 +135,6 @@ async def on_ready():
         else:
             #join the voice channel
             await channel.connect()
-            #play a sound
-            await playSound(channel.members[0])
             playInjections.start()
 
 
