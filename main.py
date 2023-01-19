@@ -185,7 +185,8 @@ async def on_voice_state_update(member, before, after):
      #   return
 
 
-            
+    
+    
 
 
 
@@ -251,7 +252,7 @@ async def send_message():
     channel = bot.get_channel(1065645686697246810)
     #get the 10 image posts from r/unket and put them in a list
     posts = []
-    for submission in reddit.subreddit("unket").hot(limit=10):
+    for submission in reddit.subreddit("shitposting").hot(limit=10):
         posts.append(submission)
     #get a random post from the list
     post = random.choice(posts)
