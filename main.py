@@ -190,6 +190,10 @@ async def on_message_delete(message):
     else:
         #send a message in the same channel as the deleted message mentioning the author of the deleted message and calling them out
         await message.channel.send("Hörrudu " + message.author.mention + ", jag såg det där!")
+        #delete the message after 5 seconds
+        await asyncio.sleep(5)
+        #delete all messages the bot has sent in the channel
+        await message.channel.purge(limit=100, check=lambda x: x.author == bot.user)
 
 
 
