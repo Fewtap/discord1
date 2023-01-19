@@ -198,8 +198,11 @@ async def on_voice_state_update(member, before, after):
         else:
             #if the bot is in the same voice channel as the member
             if bot.user in after.channel.members:
-                #play the sound
-                await playSound(member)
+                if member == bot.user:
+                    pass
+                else:
+                    #play the sound
+                    await playSound(member)
             else:
                 #disconnect and join the voice channel the member is in
                 await before.channel.guild.voice_client.disconnect()
