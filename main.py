@@ -196,6 +196,10 @@ async def send_message():
         posts.append(submission)
     #get a random post from the list
     post = random.choice(posts)
+
+    #if the post.url already exists in the channel pick another one
+    while post.url in [x.content for x in await channel.history(limit=100).flatten()]:
+        post = random.choice(posts)
     #send the post to the channel
     await channel.send(post.title + " " + post.url)
 
