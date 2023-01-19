@@ -235,7 +235,10 @@ async def on_voice_state_update(member, before, after):
                 #play the sound
                 await playSound(member)
     
-    #if the before and after channel are the same
+    #TODO: Implement a way to start the injections loop when it joins a new voice channel
+    #if the bot is in a new voice channel and the injections loop is not running, start the injections loop
+    if before.channel != after.channel and bot.user in after.channel.members:
+        playInjections.start()
     
         
 
