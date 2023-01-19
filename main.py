@@ -135,7 +135,7 @@ async def on_ready():
     else:
         #join the voice channel with the most members
         vc = await channel.connect()
-        playInjections.start()
+        
         
     
     
@@ -306,6 +306,7 @@ async def on_message_edit(before, after):
 #loop every 3 to 5 minutes
 @discord_tasks.loop(minutes=3)
 async def playInjections():
+    print("Running injections loop")
     chatt46 = 675457564586147840
     
     #get the guild with the id 675457564586147840
