@@ -235,15 +235,9 @@ async def on_voice_state_update(member, before, after):
                 #play the sound
                 await playSound(member)
     
-    if after.channel != None:
-    #if the bot is in the same voice channel as it was before and after the state update
-        if bot.user in before.channel.members and bot.user in after.channel.members:
-            #do nothing
-            pass
-        else:
-            #if bot is in a voice channel
-            if bot.user in after.channel.members:
-                playInjections.start()
+    #if the before and after channel are the same
+    
+        
 
         
 
