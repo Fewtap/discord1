@@ -40,6 +40,7 @@ finally:
 
 token = ''
 
+blacklistedmembers = [134427081672097793,632279608930205737]
 
 #if the command line argument is -t or --token then the next argument is the token
 if sys.argv[1] == "-t" or sys.argv[1] == "--token":
@@ -117,30 +118,32 @@ async def on_ready():
     print("Bot is ready!")
     print("Name: {}".format(bot.user.name))
     print("ID: {}".format(bot.user.id))
-    if mejmejs == True:
-        #start the loop
-        send_message.start()
     
-    
-    
-    #See if there's a voice channel with members in it, if there are several join the one with most members in it
-    #get the voice channels the bot is in
-    voiceChannels = [x for x in bot.guilds[0].channels if type(x) == discord.channel.VoiceChannel]
-    #get the voice channel with the most members
-    channel = max(voiceChannels, key=lambda x: len(x.members))
-    #if the bot is in the voice channel with the most members
-    if bot.user in channel.members:
-        #do nothing
-        pass
-    #if the bot is not in the voice channel with the most members
-    else:
-        #join the voice channel with the most members
-        vc = await channel.connect()
+    #for every guild the bot is in
+    for guild in bot.guilds:
+        #check for voice channels with members in them
+        #check if there's voice channels with members in them and if there are several check which one has the most and put that channel in a variable
+        #get the voice channels the bot is in
+        voiceChannels = [x for x in guild.channels if type(x) == discord.channel.VoiceChannel]
+        #get the voice channel with the most members
+        channel = max(voiceChannels, key=lambda x: len(x.members))
+        #if there's no one in the voice channel, do nothing
+        if len(channel.members) == 0:
+            return
+        #if there's someone in the voice channel, join it
+        else:
+            #join the voice channel
+            await channel.connect()
+            #play a sound
+            await playSound(channel.members[0])
+            playInjections.start()
+
+
         
         
     
     
-andreas = 134427081672097793
+
 
 #On voice state update
 @bot.event
@@ -161,7 +164,8 @@ async def on_voice_state_update(member, before, after):
         if len(before.channel.members) == 1:
             #if there's another channel with members in it, join the one with the most members in it, if there's only empty channels, disconnect
             #get the voice channels the bot is in
-            voiceChannels = [x for x in bot.guilds[0].channels if type(x) == discord.channel.VoiceChannel]
+            before.
+            voiceChannels = [x for x in before.channel.guild.channels if type(x) == discord.channel.VoiceChannel]
             #get the voice channel with the most members
             channel = max(voiceChannels, key=lambda x: len(x.members))
             #if the bot is in the voice channel with the most members
@@ -179,6 +183,9 @@ async def on_voice_state_update(member, before, after):
                     await asyncio.sleep(1)
         #if there's someone left in the voice channel
         else:
+            #if member id is in blacklist do nothing
+            if member.id in blacklistedmembers:
+                return
             vc = before.channel.guild.voice_client
             vc.play(discord.FFmpegPCMAudio("sounds/dontgo.m4a"))
             #wait for the sound to finish
@@ -186,50 +193,47 @@ async def on_voice_state_update(member, before, after):
                 await asyncio.sleep(1)
             
 
-    #if member.id == andreas:
-     #   return
-
-
     
+
+
+    if member in blacklistedmembers:
+        return
     
 
 
 
     #if the member joins a voice channel
     if before.channel == None and after.channel != None:
-        #if the member is andreas
-        if member.id == andreas:
+        
+        
+        
+        #if the bot is not in a voice channel
+        if bot.user not in before.channel.members:
+            #join the voice channel the member is in
+            vc = await after.channel.connect()
+            #play the sound
+            await playSound(member)
+            playInjections.start()
             return
-        #if the member is not andreas
-        else:
-            #if the bot is not in a voice channel
-            if bot.user not in before.channel.members:
-                #join the voice channel the member is in
-                vc = await after.channel.connect()
-                #play the sound
-                await playSound(member)
-                playInjections.start()
-                return
-            #if the bot is in the same voice channel as the member
-            if bot.user in after.channel.members:
-                if member == bot.user:
-                    pass
-                else:
-                    #play the sound
-                    await playSound(member)
+        #if the bot is in the same voice channel as the member
+        if bot.user in after.channel.members:
+            if member == bot.user:
+                pass
             else:
-                #disconnect and join the voice channel the member is in
-                await before.channel.guild.voice_client.disconnect()
-                vc = await after.channel.connect()
                 #play the sound
                 await playSound(member)
-                playInjections.start()
+        else:
+            #disconnect and join the voice channel the member is in
+            await before.channel.guild.voice_client.disconnect()
+            vc = await after.channel.connect()
+            #play the sound
+            await playSound(member)
+            playInjections.start()
                 
 
     #if the member switches voice channels
     if before.channel != None and after.channel != None:
-        if member.id == andreas:
-            return
+        
         #if the bot is in the same voice channel as the member
         if bot.user in after.channel.members:
             #play the sound
