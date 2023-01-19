@@ -47,6 +47,7 @@ if sys.argv[1] == "-t" or sys.argv[1] == "--token":
 
 # Bot Prefix
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
+bot.intents.message_content = True
 
 
 
@@ -335,6 +336,11 @@ async def playInjections():
             await asyncio.sleep(1)
     else:
         return
+
+#create a command called debate
+@bot.command()
+async def debate(ctx, arg):
+    await ctx.message.channel.send("Hej! :)")
 
 
 #run the bot
