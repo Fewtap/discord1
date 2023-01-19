@@ -55,8 +55,9 @@ bot.intents.message_content = True
 #create a function to play a sound
 async def playSound(member):
 
-    #get the sound files in the sounds folder
-    soundfiles = [x for x in os.listdir("sounds") if x.endswith(".mp3")]
+    #get the sound files in the sounds folder ending with .mp3 and .m4a
+    soundfiles = [x for x in os.listdir("sounds") if x.endswith(".mp3") or x.endswith(".m4a")]
+    
     
     #get the id of the member and compare it to the names of the mp3 files
     for x in soundfiles:
