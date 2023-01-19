@@ -2,11 +2,12 @@ from asyncio import tasks
 import datetime
 import threading
 import praw
+from discord.ext import tasks as discord_tasks
 
 #init reddit
 reddit = praw.Reddit(client_id='ej-ZEwtd6hUmvrV4nRqPHg', client_secret='UAkc21N6qnsnF9hU2ZAYk9MFIVmbDA', user_agent='your bot 0.1 by /u/your_bot')
 
-
+mejmejs = False
 
 
 try:
@@ -17,6 +18,8 @@ try:
     import random
     import os
     import sys
+    #import tasks loop
+    from asyncio import tasks
 except Exception as e:
     print("Error: " + str(e))
     print("Installing missing module...")
@@ -64,6 +67,10 @@ async def on_ready():
     print("Bot is ready!")
     print("Name: {}".format(bot.user.name))
     print("ID: {}".format(bot.user.id))
+    if mejmejs == True:
+        #start the loop
+        send_message.start()
+    
         
     #See if there's a voice channel with members in it, if there are several join the one with most members in it
     #get the voice channels the bot is in
@@ -186,7 +193,7 @@ async def on_voice_state_update(member, before, after):
         
 
 #send a message to a specific channel every five minutes
-@tasks.loop(minutes=5)
+@discord_tasks.loop(minutes=60)
 async def send_message():
     #get the channel
     channel = bot.get_channel(675461229015203861)
@@ -196,12 +203,19 @@ async def send_message():
         posts.append(submission)
     #get a random post from the list
     post = random.choice(posts)
-
+    lastmessages = []
     #if the post.url already exists in the channel pick another one
-    while post.url in [x.content for x in await channel.history(limit=100).flatten()]:
+    #get the last 100 messages in the channel
+    async for message in channel.history(limit=100):
+        lastmessages.append(message)
+    #while the post.url already exists in the channel
+    while post.url in [x.content for x in lastmessages]:
+        #get a new post
         post = random.choice(posts)
-    #send the post to the channel
-    await channel.send(post.title + " " + post.url)
+
+    #send the post.url in the channel
+    await channel.send(post.title +  " " + post.url)
+    
 
 
 #On message delete
