@@ -5,6 +5,7 @@ try:
     import asyncio
     import random
     import os
+    import sys
 except Exception as e:
     print("Error: " + str(e))
     print("Installing missing module...")
@@ -18,13 +19,19 @@ finally:
     import asyncio
     import random
     import os
+    import sys
+
+token = ''
 
 
+#if the command line argument is -t or --token then the next argument is the token
+if sys.argv[1] == "-t" or sys.argv[1] == "--token":
+    token = sys.argv[2]
 
 # Bot Prefix
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
 
-token = 'ODg4MzcyNDM3NzM2MTEyMTU4.G3Pt4m.DhgiJ-_srFFhxaHV7fLP_MzRih191UE5ZtEDOw'
+
 
 #create a function to play a sound
 def playSound(member):
