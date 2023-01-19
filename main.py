@@ -181,7 +181,9 @@ async def on_voice_state_update(member, before, after):
 
 
 #on message delete
-@bot.event
+#comment this out if you don't want the bot to call out people who delete their messages
+
+"""@bot.event
 async def on_message_delete(message):
     #if the message is from a bot do nothing
     if message.author.bot:
@@ -193,7 +195,7 @@ async def on_message_delete(message):
         #delete the message after 5 seconds
         await asyncio.sleep(5)
         #delete all messages the bot has sent in the channel
-        await message.channel.purge(limit=100, check=lambda x: x.author == bot.user)
+        await message.channel.purge(limit=100, check=lambda x: x.author == bot.user)"""
 
 
 
