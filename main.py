@@ -83,6 +83,11 @@ andreas = 134427081672097793
 #On voice state update
 @bot.event
 async def on_voice_state_update(member, before, after):
+
+    #if the state update is not from switching or joining a voice channel do nothing
+    if before.channel == after.channel:
+        return
+
     #If the member is a bot do nothing
     if member.bot:
         return
