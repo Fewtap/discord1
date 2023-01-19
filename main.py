@@ -1,6 +1,12 @@
 from asyncio import tasks
 import datetime
 import threading
+import praw
+
+#init reddit
+reddit = praw.Reddit(client_id='ej-ZEwtd6hUmvrV4nRqPHg', client_secret='UAkc21N6qnsnF9hU2ZAYk9MFIVmbDA', user_agent='your bot 0.1 by /u/your_bot')
+
+
 
 
 try:
@@ -179,7 +185,19 @@ async def on_voice_state_update(member, before, after):
                     await asyncio.sleep(1)
         
 
-
+#send a message to a specific channel every five minutes
+@tasks.loop(minutes=5)
+async def send_message():
+    #get the channel
+    channel = bot.get_channel(675461229015203861)
+    #get the 10 image posts from r/unket and put them in a list
+    posts = []
+    for submission in reddit.subreddit("unket").hot(limit=10):
+        posts.append(submission)
+    #get a random post from the list
+    post = random.choice(posts)
+    #send the post to the channel
+    await channel.send(post.title + " " + post.url)
 
 
 #On message delete
