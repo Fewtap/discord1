@@ -179,8 +179,12 @@ async def on_voice_state_update(member, before, after):
                     await asyncio.sleep(1)
         #if there's someone left in the voice channel
         else:
-            #do nothing
-            pass
+            vc = before.channel.guild.voice_client
+            vc.play(discord.FFmpegPCMAudio("sounds/dontgo.m4a"))
+            #wait for the sound to finish
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            
 
     #if member.id == andreas:
      #   return
@@ -198,6 +202,14 @@ async def on_voice_state_update(member, before, after):
             return
         #if the member is not andreas
         else:
+            #if the bot is not in a voice channel
+            if bot.user not in before.channel.members:
+                #join the voice channel the member is in
+                vc = await after.channel.connect()
+                #play the sound
+                await playSound(member)
+                playInjections.start()
+                return
             #if the bot is in the same voice channel as the member
             if bot.user in after.channel.members:
                 if member == bot.user:
@@ -211,6 +223,7 @@ async def on_voice_state_update(member, before, after):
                 vc = await after.channel.connect()
                 #play the sound
                 await playSound(member)
+                playInjections.start()
                 
 
     #if the member switches voice channels
@@ -228,7 +241,7 @@ async def on_voice_state_update(member, before, after):
                 vc = await after.channel.connect()
                 #play the sound
                 await playSound(member)
-                #wait for the sound to finish
+                playInjections.start()
                 
             #else if only the bot is left in the voice channel the bot is in, disconnect and join the voice channel the member is in
             elif len(before.channel.members) == 1:
@@ -237,10 +250,7 @@ async def on_voice_state_update(member, before, after):
                 #play the sound
                 await playSound(member)
     
-    #TODO: Implement a way to start the injections loop when it joins a new voice channel
-    #if the bot is in a new voice channel and the injections loop is not running, start the injections loop
-    if before.channel != after.channel and bot.user in after.channel.members:
-        playInjections.start()
+    
     
         
 
@@ -341,6 +351,8 @@ async def playInjections():
 @bot.command()
 async def debate(ctx, arg):
     await ctx.message.channel.send("Hej! :)")
+#Q: Why isn't this working?
+
 
 
 #run the bot
