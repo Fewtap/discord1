@@ -184,7 +184,8 @@ async def on_voice_state_update(member, before, after):
             #if member id is in blacklist do nothing
             if member.id in blacklistedmembers:
                 return
-            
+            vc = before.channel.guild.voice_client
+            vc.play(discord.FFmpegPCMAudio("sounds/dontgo.m4a"))
             #wait for the sound to finish
             while vc.is_playing():
                 await asyncio.sleep(1)
