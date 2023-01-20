@@ -8,6 +8,7 @@ from discord.ext import tasks as discord_tasks
 reddit = praw.Reddit(client_id='ej-ZEwtd6hUmvrV4nRqPHg', client_secret='UAkc21N6qnsnF9hU2ZAYk9MFIVmbDA', user_agent='your bot 0.1 by /u/your_bot')
 
 mejmejs = True
+timer = None
 
 
 try:
@@ -133,6 +134,11 @@ async def on_ready():
             return
         #if there's someone in the voice channel, join it
         else:
+            #get all the ids of the members in the channel
+            members = [x.id for x in channel.members]
+            #if any of the values in the list are in the blacklistedmembers list, do nothing
+            if any(x in blacklistedmembers for x in members):
+                return
             #join the voice channel
             await channel.connect()
             playInjections.start()
@@ -184,8 +190,7 @@ async def on_voice_state_update(member, before, after):
             #if member id is in blacklist do nothing
             if member.id in blacklistedmembers:
                 return
-            vc = before.channel.guild.voice_client
-            vc.play(discord.FFmpegPCMAudio("sounds/dontgo.m4a"))
+            
             #wait for the sound to finish
             while vc.is_playing():
                 await asyncio.sleep(1)
@@ -254,7 +259,56 @@ async def on_voice_state_update(member, before, after):
     
     
     
-        
+#on message
+import datetime
+
+last_run_timeTjack = None
+
+@bot.event
+async def on_message(message):
+
+    tjackphrases = ["Fett sunkigt att sitta och prata om droger men ok","Sluta tjacka ta en havreboll istället"]
+    botphrases = ["Käften hora du kan va en bot","Jag bot? HAHA jag är i alla fall ingen NPC irl som dig", "Sitter du och pratar bakom min rygg? Det hade jag också gjort om jag såg ut som du" ]
+    mentionPhrases = ["Sluta pinga mig horunge", "Lägg av bara Bill får pinga mig", "Jag är inte din hund, sluta pinga mig"]
+    global last_run_timeTjack
+    global last_run_mentions
+    global last_run_botMention
+    current_time = datetime.datetime.now()
+    if last_run_timeTjack is not None:
+        time_since_last_run = current_time - last_run_timeTjack
+        if time_since_last_run.total_seconds() < 10800:  # 3 hours in seconds
+            pass
+        else:
+            last_run_timeTjack = current_time
+
+            if message.author == bot.user:
+                return
+            if message.author.id in blacklistedmembers:
+                return
+            if "tjack" in message.content.lower():
+                #send a random phrase from the list
+                await message.channel.send(random.choice(tjackphrases))
+    if last_run_timeTjack is not None:
+        time_since_last_run = current_time - last_run_mentions
+        if time_since_last_run.total_seconds() < 10800:  # 3 hours in seconds
+            pass
+        else:
+            last_run_timeTjack = current_time
+
+            #if the bot was mentioned respond with a random phrase from the list
+            if bot.user.mentioned_in(message):
+                await message.channel.send("S")
+    if last_run_timeTjack is not None:
+        time_since_last_run = current_time - last_run_botMention
+        if time_since_last_run.total_seconds() < 10800:  # 3 hours in seconds
+            pass
+        else:
+            last_run_botMention = current_time
+
+            #if the message contains the word "bot" and "Tilda" respond with a random phrase from the list
+            if "bot" in message.content.lower() and "tilda" in message.content.lower():
+                return
+
 
         
 
