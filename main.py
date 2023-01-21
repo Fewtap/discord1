@@ -50,11 +50,31 @@ if sys.argv[1] == "-t" or sys.argv[1] == "--token":
 # Bot Prefix
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.default())
 bot.intents.message_content = True
+bot.intents.members = True
+bot.intents.guilds = True
+bot.intents.presences = True
+bot.intents.guild_messages = True
+bot.intents.guild_reactions = True
+
 
 
 
 #create a function to play a sound
-async def playSound(member):
+async def playSound(member, generic = False):
+
+    if generic == True:
+        #get sound files in the sounds/generic folder
+        soundfiles = [x for x in os.listdir("sounds/generic") if x.endswith(".mp3")]
+        #get a random sound file
+        soundfile = random.choice(soundfiles)
+        #build a path to the sound file
+        path = "sounds/generic/" + soundfile
+        #play the sound with high volume
+        member.guild.voice_client.play(discord.FFmpegPCMAudio(path))
+        #wait for the sound to finish
+        while member.guild.voice_client.is_playing():
+            await asyncio.sleep(1)
+        return
 
     #get the sound files in the sounds folder ending with .mp3 and .m4a
     soundfiles = [x for x in os.listdir("sounds") if x.endswith(".mp3") or x.endswith(".m4a")]
@@ -90,28 +110,7 @@ async def playSound(member):
             await asyncio.sleep(1)
 
 
-    """#2 procent chance of playing "arg.mp3"
-    number = random.randint(1,100)
-    print(number)
-    if number <= 10:
-        #play the sound
-        member.guild.voice_client.play(discord.FFmpegPCMAudio("arg.mp3"))
-        #wait for the sound to finish
-        while member.guild.voice_client.is_playing():
-            await asyncio.sleep(1)
-    #if number is between 10 and 30
-    elif number > 10 and number <= 30:
-        #play the sound
-        member.guild.voice_client.play(discord.FFmpegPCMAudio("eww.mp3"))
-        #wait for the sound to finish
-        while member.guild.voice_client.is_playing():
-            await asyncio.sleep(1)
-    else:
-        #play the sound
-        member.guild.voice_client.play(discord.FFmpegPCMAudio("final.mp3"))
-        #wait for the sound to finish
-        while member.guild.voice_client.is_playing():
-            await asyncio.sleep(1)"""
+    
     
 
 # Bot Startup
@@ -134,14 +133,17 @@ async def on_ready():
             return
         #if there's someone in the voice channel, join it
         else:
-            #get all the ids of the members in the channel
-            members = [x.id for x in channel.members]
-            #if any of the values in the list are in the blacklistedmembers list, do nothing
-            if any(x in blacklistedmembers for x in members):
-                return
+            if len(channel.members) == 1:
+                if channel.members[0] == bot.user:
+                    await channel.guild.voice_client.disconnect()
+                if channel.members[0].id in blacklistedmembers:
+                    return
             #join the voice channel
             await channel.connect()
-            playInjections.start()
+            #play a generic sound
+            await playSound(channel.members[0], generic = True)
+            
+
 
 
         
@@ -153,6 +155,9 @@ async def on_ready():
 #On voice state update
 @bot.event
 async def on_voice_state_update(member, before, after):
+
+    if member == bot.user:
+        return
 
     await asyncio.sleep(2)
     #if the state update is not from switching or joining a voice channel do nothing
@@ -199,7 +204,7 @@ async def on_voice_state_update(member, before, after):
     
 
 
-    if member in blacklistedmembers:
+    if member.id in blacklistedmembers:
         return
     
 
@@ -208,7 +213,8 @@ async def on_voice_state_update(member, before, after):
     #if the member joins a voice channel
     if before.channel == None and after.channel != None:
         
-        
+        if "AFK" in after.channel.name:
+            return
         
         #if the bot is not in a voice channel
         if bot.user not in after.channel.members:
@@ -236,6 +242,9 @@ async def on_voice_state_update(member, before, after):
 
     #if the member switches voice channels
     if before.channel != None and after.channel != None:
+        #if the after channels name contains "AFK" do nothing
+        if "AFK" in after.channel.name:
+            return
         
         #if the bot is in the same voice channel as the member
         if bot.user in after.channel.members:
