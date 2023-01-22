@@ -57,18 +57,27 @@ async def DeleteTextMessages():
             pass"""
     # get the last 1000 messages in the channel and put them in a list
     messages = []
-    async for message in channel.history(limit=1000):
+    async for message in channel.history(limit=200):
         if message.attachments != []:
             print(message.content)
         elif "http" in message.content:
             print(message.content)
         else:
-            # send a delete request 40 messages per second
-            messages.append(message)
-            if len(messages) == 40:
-                await channel.delete_messages(messages)
-                messages = []
-                await asyncio.sleep(1)
+            # get the time difference between the message and now
+            timeDifference = datetime.datetime.now() - message.created_at
+            # if the message is less that 14 days old add it to the list
+            if timeDifference.days < 14:
+
+                messages.append(message)
+
+        # if there's more than 40 messages in the list split them into chunks of 40 and delete them
+        if len(messages) > 40:
+            for i in range(0, len(messages), 40):
+                await channel.delete_messages(messages[i : i + 40])
+            messages = []
+        else:
+            if len(messages) != 0 and len(messages < 40):
+                channel.delete_messages(messages)
 
 
 selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
@@ -228,7 +237,20 @@ last_run_timeTjack = None
 
 @bot.event
 async def on_message(message):
-    print(message.content)
+
+    # write to file
+    with open("log.txt", "a") as f:
+        f.write(
+            message.content
+            + " "
+            + str(message.author)
+            + " "
+            + str(message.author.id)
+            + " "
+            + str(message.channel)
+            + " "
+            + str(message.guild)
+        )
 
     tjackphrases = [
         "Fett sunkigt att sitta och prata om droger men ok",
