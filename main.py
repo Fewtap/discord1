@@ -278,9 +278,6 @@ async def send_message():
     await channel.send(post.title + "\n" + post.url)
 
 
-discord_tasks.loop(minutes=10)
-
-
 async def DeleteTextMessages():
     channelID = 675461786056785975
     channel = bot.get_channel(channelID)
@@ -306,6 +303,7 @@ async def DeleteTextMessages():
             print(message.content)
 
 
+discord_tasks.loop(minutes=10)(DeleteTextMessages)
 # On message delete
 @bot.event
 async def on_message_delete(message):
