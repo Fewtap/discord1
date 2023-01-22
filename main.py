@@ -65,8 +65,12 @@ async def DeleteTextMessages():
         else:
             messages.append(message)
 
-    if messages != []:  # bulk delete the messages
-        await channel.delete_messages(messages)
+    if messages != []:
+        # split the list into chunks of 100
+        messages = [messages[i : i + 100] for i in range(0, len(messages), 100)]
+        # delete the chunks
+        for chunk in messages:
+            channel.delete_messages(chunk)
 
 
 selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
