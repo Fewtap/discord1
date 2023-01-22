@@ -40,6 +40,30 @@ bot.intents.guilds = True
 bot.intents.presences = True
 bot.intents.guild_messages = True
 bot.intents.guild_reactions = True
+bot.intents = [1088840793920]
+
+
+async def MovetoPopulatedChannel():
+    for guild in bot.guilds:
+
+        if guild.voice_client == None:
+            continue
+
+            # get the most populated voice channel and connect to it
+        voicechannel = max(guild.voice_channels, key=lambda x: len(x.members))
+        if voicechannel != None:
+            if len(guild.voice_client.channel.members) > 1:
+                continue
+            if bot.user in voicechannel.members:
+                continue
+            await voicechannel.guild.voice_client.disconnect()
+            await voicechannel.connect()
+            break
+        else:
+            await voicechannel.connect()
+
+
+movetoChannelLoop = discord_tasks.loop(seconds=10)(MovetoPopulatedChannel)
 
 
 async def DeleteTextMessages():
@@ -92,6 +116,7 @@ async def on_ready():
     print("Discord Version: {}".format(discord.__version__))
 
     selfieschannel.start()
+    movetoChannelLoop.start()
     # for every guild the bot is in
     for guild in bot.guilds:
         # check for voice channels with members in them
