@@ -280,14 +280,17 @@ async def DeleteTextMessages():
     channel = bot.get_channel(channelID)
 
     # get all messages that does not contain an image
-    async for message in channel.history(limit=1000):
+    """async for message in channel.history(limit=1000):
         if message.attachments == []:
             # if there's a link in the message
             if "http" in message.content:
                 break
             await message.delete()
         else:
-            pass
+            pass"""
+    async for message in channel.history(limit=1000):
+        if message.attachments != []:
+            print(message.attachments)
 
 
 # On message delete
