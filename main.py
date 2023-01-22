@@ -1,6 +1,7 @@
 from asyncio import tasks
 import asyncio
 import datetime
+import json
 import os
 import random
 import sys
@@ -32,15 +33,13 @@ if len(sys.argv) > 1:
         print("Invalid command line arguments")
         sys.exit(1)
 
-# Bot Prefix
-bot = commands.Bot(command_prefix="!", intents=discord.Intents.default())
-bot.intents.message_content = True
-bot.intents.members = True
-bot.intents.guilds = True
-bot.intents.presences = True
-bot.intents.guild_messages = True
-bot.intents.guild_reactions = True
-bot.intents = [1088840793920]
+# add necessary intents in a variable
+intents = discord.Intents.default()
+intents.members = True
+intents.message_content = True
+
+
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 async def MovetoPopulatedChannel():
@@ -261,21 +260,115 @@ last_run_timeTjack = None
 
 
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.message.Message):
 
     # write to file
-    with open("log.txt", "a") as f:
-        f.write(
-            message.content
-            + " "
-            + str(message.author)
-            + " "
-            + str(message.author.id)
-            + " "
-            + str(message.channel)
-            + " "
-            + str(message.guild)
-        )
+    if message.author == bot.user:
+        return
+
+    with open("logs.txt", "a", encoding="utf-8") as f:
+        # create a dict with the message data
+        messageData = {
+            "author": message.author.name,
+            "content": message.content,
+            "time": message.created_at,
+            "channel": message.channel.name,
+            "guild": message.guild.name,
+            "guild_id": message.guild.id,
+            "channel_id": message.channel.id,
+            "author_id": message.author.id,
+            "message_id": message.id,
+        }
+
+        # check if there's a folder in the current directory with the guild id as name
+        if not os.path.exists(str(message.guild.id)):
+            # if not create one
+            os.makedirs(str(message.guild.id))
+            # create a folder with the channel id as name
+            os.makedirs(str(message.guild.id) + "/" + str(message.channel.id))
+            # create a json file with just the date as it's name
+            with open(
+                str(message.guild.id)
+                + "/"
+                + str(message.channel.id)
+                + "/"
+                + str(message.created_at.date())
+                + ".json",
+                "w",
+            ) as f:
+                # write the message data to the file
+                json.dump(messageData, f, indent=4)
+        # if there's a folder with the guild id as name
+        else:
+            # check if there's a folder with the channel id as name
+            if not os.path.exists(
+                str(message.guild.id) + "/" + str(message.channel.id)
+            ):
+                # if not create one
+                os.makedirs(str(message.guild.id) + "/" + str(message.channel.id))
+                # create a json file with just the date as it's name
+                with open(
+                    str(message.guild.id)
+                    + "/"
+                    + str(message.channel.id)
+                    + "/"
+                    + str(message.created_at.date())
+                    + ".json",
+                    "w",
+                ) as f:
+                    # write the message data to the file
+                    json.dump(messageData, f, indent=4)
+            # if there's a folder with the channel id as name
+            else:
+                # check if there's a json file with the date as it's name
+                if not os.path.exists(
+                    str(message.guild.id)
+                    + "/"
+                    + str(message.channel.id)
+                    + "/"
+                    + str(message.created_at.date())
+                    + ".json"
+                ):
+                    # if not create one
+                    with open(
+                        str(message.guild.id)
+                        + "/"
+                        + str(message.channel.id)
+                        + "/"
+                        + str(message.created_at.date())
+                        + ".json",
+                        "w",
+                    ) as f:
+                        # write the message data to the file
+                        json.dump(messageData, f, indent=4)
+                # if there's a json file with the date as it's name
+                else:
+                    # open the file
+                    with open(
+                        str(message.guild.id)
+                        + "/"
+                        + str(message.channel.id)
+                        + "/"
+                        + str(message.created_at.date())
+                        + ".json",
+                        "r",
+                    ) as f:
+                        # read the file
+                        data = json.load(f)
+                    # append the message data to the file
+                    data.append(messageData)
+                    # open the file
+                    with open(
+                        str(message.guild.id)
+                        + "/"
+                        + str(message.channel.id)
+                        + "/"
+                        + str(message.created_at.date())
+                        + ".json",
+                        "w",
+                    ) as f:
+                        # write the message data to the file
+                        json.dump(data, f, indent=4)
 
     tjackphrases = [
         "Fett sunkigt att sitta och prata om droger men ok",
@@ -291,44 +384,21 @@ async def on_message(message):
         "Lägg av bara Bill får pinga mig",
         "Jag är inte din hund, sluta pinga mig",
     ]
-    global last_run_timeTjack
-    global last_run_mentions
-    global last_run_botMention
-    current_time = datetime.datetime.now()
-    if last_run_timeTjack is not None:
-        time_since_last_run = current_time - last_run_timeTjack
-        if time_since_last_run.total_seconds() < 10800:  # 3 hours in seconds
-            pass
-        else:
-            last_run_timeTjack = current_time
 
-            if message.author == bot.user:
-                return
-            if message.author.id in blacklistedmembers:
-                return
-            if "tjack" in message.content.lower():
-                # send a random phrase from the list
-                await message.channel.send(random.choice(tjackphrases))
-    if last_run_timeTjack is not None:
-        time_since_last_run = current_time - last_run_mentions
-        if time_since_last_run.total_seconds() < 10800:  # 3 hours in seconds
-            pass
-        else:
-            last_run_timeTjack = current_time
+    botmessage = None
 
-            # if the bot was mentioned respond with a random phrase from the list
-            if bot.user.mentioned_in(message):
-                await message.channel.send("S")
-    if last_run_timeTjack is not None:
-        time_since_last_run = current_time - last_run_botMention
-        if time_since_last_run.total_seconds() < 10800:  # 3 hours in seconds
-            pass
-        else:
-            last_run_botMention = current_time
+    if bot.user in message.mentions:
+        phrase = random.choice(mentionPhrases)
+        botmessage = await message.reply(phrase)
 
-            # if the message contains the word "bot" and "Tilda" respond with a random phrase from the list
-            if "bot" in message.content.lower() and "tilda" in message.content.lower():
-                return
+    elif "tjack" in message.content.lower():
+        phrase = random.choice(tjackphrases)
+        await message.reply(phrase)
+
+    # elif bot and tindra is anywhere in the string
+    elif "bot" in message.content.lower() and "tindra" in message.content.lower():
+        phrase = random.choice(botphrases)
+        await message.reply(phrase)
 
 
 # send a message to a specific channel every five minutes
@@ -383,9 +453,14 @@ async def on_message_edit(before, after):
         return
     # if the message is not from a bot
     else:
+        if "http" in after.content:
+            return
+        # if there's an attachment in the message do nothing
+        if len(after.attachments) > 0:
+            return
         # send a message in the same channel as the edited message mentioning the author of the edited message and calling them out
         botmessage = await before.channel.send(
-            "HAHAHAHAH" + before.author.mention + " KAN INTE SKRIVA"
+            "HAHAHAHAH " + before.author.mention + " KAN INTE SKRIVA"
         )
         # delete the message after 5 seconds
         await asyncio.sleep(5)
