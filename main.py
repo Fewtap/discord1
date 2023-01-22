@@ -48,7 +48,9 @@ async def on_ready():
     print("Bot is ready!")
     print("Name: {}".format(bot.user.name))
     print("ID: {}".format(bot.user.id))
+    print("Discord Version: {}".format(discord.__version__))
 
+    DeleteTextMessages.start()
     # for every guild the bot is in
     for guild in bot.guilds:
         # check for voice channels with members in them
