@@ -292,9 +292,16 @@ async def DeleteTextMessages():
             await message.delete()
         else:
             pass"""
+    # get the last 1000 messages in the channel and put them in a list
+    messages = []
     async for message in channel.history(limit=1000):
+        messages.append(message)
+    # if the message contains an image or a link print the message
+    for message in messages:
         if message.attachments != []:
-            print(message.attachments)
+            print(message.content)
+        elif "http" in message.content:
+            print(message.content)
 
 
 # On message delete
