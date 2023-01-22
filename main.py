@@ -267,17 +267,16 @@ async def on_message(message: discord.message.Message):
         return
 
     with open("logs.txt", "a", encoding="utf-8") as f:
-        # create a dict with the message data
+        # create a dict with the message data and all values as strings
         messageData = {
-            "author": message.author.name,
-            "content": message.content,
-            "time": message.created_at,
-            "channel": message.channel.name,
-            "guild": message.guild.name,
-            "guild_id": message.guild.id,
-            "channel_id": message.channel.id,
-            "author_id": message.author.id,
-            "message_id": message.id,
+            "author": str(message.author),
+            "author_id": str(message.author.id),
+            "content": str(message.content),
+            "channel": str(message.channel),
+            "channel_id": str(message.channel.id),
+            "guild": str(message.guild),
+            "guild_id": str(message.guild.id),
+            "created_at": str(message.created_at),
         }
 
         # check if there's a folder in the current directory with the guild id as name
