@@ -25,8 +25,12 @@ token = ""
 blacklistedmembers = [134427081672097793, 632279608930205737]
 
 # if the command line argument is -t or --token then the next argument is the token
-if SYSTEM_ERROR.argv[1] == "-t" or sys.argv[1] == "--token":
-    token = sys.argv[2]
+if len(sys.argv) > 1:
+    if sys.argv[1] == "-t" or sys.argv[1] == "--token":
+        token = sys.argv[2]
+    else:
+        print("Invalid command line arguments")
+        sys.exit(1)
 
 # Bot Prefix
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.default())
