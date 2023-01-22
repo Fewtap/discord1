@@ -70,6 +70,9 @@ async def DeleteTextMessages():
         messages = [messages[i : i + 100] for i in range(0, len(messages), 100)]
         # delete the chunks
         for chunk in messages:
+            # print a formatted string with the amount of messages deleted
+            print(f"Deleted {len(chunk)} messages")
+            print(f"Time: {datetime.datetime.now()}")
             await channel.delete_messages(chunk)
 
 
