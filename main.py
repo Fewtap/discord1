@@ -65,8 +65,8 @@ async def DeleteTextMessages():
         else:
             messages.append(message)
 
-            # bulk delete the messages
-            await channel.delete_messages(messages)
+    if messages != []:  # bulk delete the messages
+        await channel.delete_messages(messages)
 
 
 selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
