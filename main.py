@@ -70,7 +70,7 @@ async def DeleteTextMessages():
         messages = [messages[i : i + 100] for i in range(0, len(messages), 100)]
         # delete the chunks
         for chunk in messages:
-            channel.delete_messages(chunk)
+            await channel.delete_messages(chunk)
 
 
 selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
