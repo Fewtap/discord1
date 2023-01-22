@@ -63,17 +63,12 @@ async def DeleteTextMessages():
         elif "http" in message.content:
             print(message.content)
         else:
+            # send a delete request 40 messages per second
             messages.append(message)
-
-    if messages != []:
-        # split the list into chunks of 100
-        messages = [messages[i : i + 100] for i in range(0, len(messages), 100)]
-        # delete the chunks
-        for chunk in messages:
-            # print a formatted string with the amount of messages deleted
-            print(f"Deleted {len(chunk)} messages")
-            print(f"Time: {datetime.datetime.now()}")
-            await channel.delete_messages(chunk)
+            if len(messages) == 40:
+                await channel.delete_messages(messages)
+                messages = []
+                await asyncio.sleep(1)
 
 
 selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
