@@ -63,8 +63,10 @@ async def DeleteTextMessages():
         elif "http" in message.content:
             print(message.content)
         else:
-            await message.delete()
-    # if the message contains an image or a link print the message
+            messages.append(message)
+
+            # bulk delete the messages
+            await channel.delete_messages(messages)
 
 
 selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
