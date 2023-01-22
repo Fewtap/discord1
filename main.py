@@ -42,6 +42,34 @@ bot.intents.guild_messages = True
 bot.intents.guild_reactions = True
 
 
+async def DeleteTextMessages():
+    channelID = 675461786056785975
+    channel = bot.get_channel(channelID)
+
+    # get all messages that does not contain an image
+    """async for message in channel.history(limit=1000):
+        if message.attachments == []:
+            # if there's a link in the message
+            if "http" in message.content:
+                break
+            await message.delete()
+        else:
+            pass"""
+    # get the last 1000 messages in the channel and put them in a list
+    messages = []
+    async for message in channel.history(limit=1000):
+        messages.append(message)
+    # if the message contains an image or a link print the message
+    for message in messages:
+        if message.attachments != []:
+            print(message.content)
+        elif "http" in message.content:
+            print(message.content)
+
+
+selfieschannel = discord_tasks.loop(minutes=10)(DeleteTextMessages)
+
+
 # Bot Startup
 @bot.event
 async def on_ready():
@@ -50,7 +78,7 @@ async def on_ready():
     print("ID: {}".format(bot.user.id))
     print("Discord Version: {}".format(discord.__version__))
 
-    DeleteTextMessages.start()
+    selfieschannel.start()
     # for every guild the bot is in
     for guild in bot.guilds:
         # check for voice channels with members in them
@@ -278,32 +306,6 @@ async def send_message():
     await channel.send(post.title + "\n" + post.url)
 
 
-async def DeleteTextMessages():
-    channelID = 675461786056785975
-    channel = bot.get_channel(channelID)
-
-    # get all messages that does not contain an image
-    """async for message in channel.history(limit=1000):
-        if message.attachments == []:
-            # if there's a link in the message
-            if "http" in message.content:
-                break
-            await message.delete()
-        else:
-            pass"""
-    # get the last 1000 messages in the channel and put them in a list
-    messages = []
-    async for message in channel.history(limit=1000):
-        messages.append(message)
-    # if the message contains an image or a link print the message
-    for message in messages:
-        if message.attachments != []:
-            print(message.content)
-        elif "http" in message.content:
-            print(message.content)
-
-
-discord_tasks.loop(minutes=10)(DeleteTextMessages)
 # On message delete
 @bot.event
 async def on_message_delete(message):
