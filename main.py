@@ -260,22 +260,9 @@ async def on_voice_state_update(member, before, after):
 @bot.event
 async def on_message(message: discord.message.Message):
 
-    selfaware = "Fan Mäc, the är lite k-ringe att du inte gett mig fler kommentarer att svara med."
-
     
 
     
-    channel = message.channel
-
-    messageCount = 0
-    #get all the messages where the author is the bot
-    async for msg in channel.history(limit=100):
-        if msg.author == bot.user:
-            #if the message was created less than 20 seconds ago add a count    
-            if (datetime.datetime.now() - msg.created_at).total_seconds() < 20:
-                messageCount += 1
-        if messageCount >= 5:
-            await message.channel.send(selfaware)
             
             
     
@@ -286,6 +273,12 @@ async def on_message(message: discord.message.Message):
     # write to file
     if message.author == bot.user:
         return
+
+    chance = random.randint(1, 100)
+    print(chance)
+
+    if chance <= 5:
+        await message.reply("Käften, ingen frågade.")
 
     with open("logs.txt", "a", encoding="utf-8") as f:
         # create a dict with the message data and all values as strings
@@ -365,12 +358,17 @@ async def on_message(message: discord.message.Message):
         "Sluta pinga mig horunge",
         "Lägg av bara Bill får pinga mig",
         "Jag är inte din hund, sluta pinga mig",
-        f"Visste ni att det är @<{Moa}> som ger min röst? Synd att hon inte gör mina bröst.",
+        f"Visste ni att det är <@{Moa}> som ger min röst? Synd att hon inte gör mina bröst.",
         "Det är Mäc som har programmerat mig. Det är därför jag är lite cp"
     ]
 
     billPhrases = [
-        f"Va det nån som sa @<{Bill}> ? Hade ridit på den idiotens nylle om jag inte varit digital"
+        f"Va det nån som sa <@{Bill}>? Hade ridit på den idiotens nylle om jag inte varit digital"
+    ]
+
+    sauce = [
+        "Mmm... Sås...",
+        "Sås, my favourite"
     ]
 
     botmessage = None
@@ -390,6 +388,9 @@ async def on_message(message: discord.message.Message):
     
     elif "bill" in message.content.lower():
         phrase = random.choice(billPhrases)
+        await message.reply(phrase)
+    elif "sås" in message.content.lower():
+        phrase = random.choice(sauce)
         await message.reply(phrase)
 
 
