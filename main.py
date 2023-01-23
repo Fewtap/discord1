@@ -504,6 +504,7 @@ bot.command()
 async def join(ctx):
     if ctx.author.voice != None:
         await ctx.author.voice.channel.connect()
+        playInjections.start()
     else:
         await ctx.send("Du måste vara i en röstkanal för att göra det där")
 
