@@ -261,7 +261,21 @@ async def on_voice_state_update(member, before, after):
 @bot.event
 async def on_message(message: discord.message.Message):
 
-    
+    if "!dc" in message.content:
+        if message.author in message.guild.voice_client.channel.members:
+            await message.channel.send("Hej DÅ!")
+            await message.guild.voice_client.disconnect()
+            return
+    elif "!join" in message.content.lower():
+        if message.author in message.guild.voice_client.channel.members:
+            await message.channel.send("Jag är redan här!")
+            return
+        else:
+            await message.guild.voice_client.disconnect()
+            vc = await message.author.voice.channel.connect()
+            await message.channel.send("Jag är här!")
+            return
+        
 
     
             
