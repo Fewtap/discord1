@@ -37,7 +37,7 @@ intents.members = True
 intents.message_content = True
 
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot: commands.Bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 async def MovetoPopulatedChannel():
@@ -262,12 +262,14 @@ async def on_message(message: discord.message.Message):
 
     selfaware = "Fan Mäc, the är lite k-ringe att du inte gett mig fler kommentarer att svara med."
 
+    
 
+    
+    channel = message.channel
 
-    #if the bot has sent more than 5 messages in the last 20 seconds send a message with the selfaware variable
-    if len(bot.messages) > 5:
-        if bot.messages[0].created_at - bot.messages[4].created_at < datetime.timedelta(seconds=10):
-            await message.channel.send(selfaware)
+    #if the more than 5 messages have been sent from the bot in the last 20 seconds in the channel variable
+    if len([m for m in await channel.history(limit=20).flatten() if m.author == bot.user]) > 5:
+        await message.channel.send(selfaware)
     
 
     
