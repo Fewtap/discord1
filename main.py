@@ -500,6 +500,13 @@ async def dc(ctx):
     if ctx.guild.voice_client != None:
         await ctx.guild.voice_client.disconnect()
 
+bot.command()
+async def join(ctx):
+    if ctx.author.voice != None:
+        await ctx.author.voice.channel.connect()
+    else:
+        await ctx.send("Du måste vara i en röstkanal för att göra det där")
+
 
 # run the bot
 bot.run(token)
