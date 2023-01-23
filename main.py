@@ -319,6 +319,7 @@ async def on_message(message: discord.message.Message):
                         # read the json file
                         messageDataList = json.load(f)
                         # append the message data to the list
+                    with open(f"{message.guild.id}/{message.channel.id}/{message.created_at.date()}.json", "w") as f:
                         messageDataList.append(messageData)
                         # write the list to the json file
                         json.dump(messageDataList, f)
