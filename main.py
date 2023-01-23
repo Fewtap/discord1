@@ -292,7 +292,7 @@ async def on_message(message: discord.message.Message):
                     # append the message data to the list
                     messageDataList.append(messageData)
                     # write the list to the json file
-                    json.dump(messageDataList, f)
+                    json.dump(messageDataList, f, indent=4)
         else:
             #check if there's a folder with the channel id as the name
             if not os.path.exists(f"{message.guild.id}/{message.channel.id}"):
@@ -303,7 +303,7 @@ async def on_message(message: discord.message.Message):
                     # append the message data to the list
                     messageDataList.append(messageData)
                     # write the list to the json file
-                    json.dump(messageDataList, f)
+                    json.dump(messageDataList, f, indent=4)
             else:
                 #check if there's a json file with the message creation date as the name
                 if not os.path.exists(f"{message.guild.id}/{message.channel.id}/{message.created_at.date()}.json"):
@@ -312,7 +312,7 @@ async def on_message(message: discord.message.Message):
                         # append the message data to the list
                         messageDataList.append(messageData)
                         # write the list to the json file
-                        json.dump(messageDataList, f)
+                        json.dump(messageDataList, f, indent=4)
                 else:
                     # if there is a json file with the message creation date as the name
                     with open(f"{message.guild.id}/{message.channel.id}/{message.created_at.date()}.json", "r") as f:
@@ -322,7 +322,7 @@ async def on_message(message: discord.message.Message):
                     with open(f"{message.guild.id}/{message.channel.id}/{message.created_at.date()}.json", "w") as f:
                         messageDataList.append(messageData)
                         # write the list to the json file
-                        json.dump(messageDataList, f)
+                        json.dump(messageDataList, f, indent=4)
 
     tjackphrases = [
         "Fett sunkigt att sitta och prata om droger men ok",
