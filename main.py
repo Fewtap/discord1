@@ -267,9 +267,18 @@ async def on_message(message: discord.message.Message):
     
     channel = message.channel
 
-    #if the more than 5 messages have been sent from the bot in the last 20 seconds in the channel variable
-    if len([m for m in await channel.history(limit=20).flatten() if m.author == bot.user]) > 5:
-        await message.channel.send(selfaware)
+    messageCount = 0
+    #get all the messages where the author is the bot
+    async for msg in channel.history(limit=100):
+        if msg.author == bot.user:
+            #if the message was created less than 20 seconds ago add a count    
+            if (datetime.datetime.now() - msg.created_at).total_seconds() < 20:
+                messageCount += 1
+        if messageCount >= 5:
+            await message.channel.send(selfaware)
+            
+            
+    
     
 
     
