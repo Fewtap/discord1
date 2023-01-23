@@ -187,9 +187,7 @@ async def on_voice_state_update(member, before, after):
             if member.id in blacklistedmembers:
                 return
 
-            # wait for the sound to finish
-            while vc.is_playing():
-                await asyncio.sleep(1)
+            
 
     if member.id in blacklistedmembers:
         return
