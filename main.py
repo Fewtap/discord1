@@ -276,95 +276,52 @@ async def on_message(message: discord.message.Message):
             "created_at": str(message.created_at),
         }
 
-        # check if there's a folder in the current directory with the guild id as name
-        if not os.path.exists(str(message.guild.id)):
+        #make a list of dicts
+        messageDataList = []
+
+        #check if there's a folder with the guild id as the name
+        if not os.path.exists(f"{message.guild.id}"):
             # if not create one
-            os.makedirs(str(message.guild.id))
-            # create a folder with the channel id as name
-            os.makedirs(str(message.guild.id) + "/" + str(message.channel.id))
-            # create a json file with just the date as it's name
-            with open(
-                str(message.guild.id)
-                + "/"
-                + str(message.channel.id)
-                + "/"
-                + str(message.created_at.date())
-                + ".json",
-                "w",
-            ) as f:
-                # write the message data to the file
-                json.dump(messageData, f, indent=4)
-        # if there's a folder with the guild id as name
-        else:
-            # check if there's a folder with the channel id as name
-            if not os.path.exists(
-                str(message.guild.id) + "/" + str(message.channel.id)
-            ):
+            os.makedirs(f"{message.guild.id}")
+            #check if there's a folder with the channel id as the name
+            if not os.path.exists(f"{message.guild.id}/{message.channel.id}"):
                 # if not create one
-                os.makedirs(str(message.guild.id) + "/" + str(message.channel.id))
-                # create a json file with just the date as it's name
-                with open(
-                    str(message.guild.id)
-                    + "/"
-                    + str(message.channel.id)
-                    + "/"
-                    + str(message.created_at.date())
-                    + ".json",
-                    "w",
-                ) as f:
-                    # write the message data to the file
-                    json.dump(messageData, f, indent=4)
-            # if there's a folder with the channel id as name
+                os.makedirs(f"{message.guild.id}/{message.channel.id}")
+                #create a json file with the message creation date as the name
+                with open(f"{message.guild.id}/{message.channel.id}/{message.created_at}.json", "w") as f:
+                    # append the message data to the list
+                    messageDataList.append(messageData)
+                    # write the list to the json file
+                    json.dump(messageDataList, f)
+        else:
+            #check if there's a folder with the channel id as the name
+            if not os.path.exists(f"{message.guild.id}/{message.channel.id}"):
+                # if not create one
+                os.makedirs(f"{message.guild.id}/{message.channel.id}")
+                #create a json file with the message creation date as the name
+                with open(f"{message.guild.id}/{message.channel.id}/{message.created_at}.json", "w") as f:
+                    # append the message data to the list
+                    messageDataList.append(messageData)
+                    # write the list to the json file
+                    json.dump(messageDataList, f)
             else:
-                # check if there's a json file with the date as it's name
-                if not os.path.exists(
-                    str(message.guild.id)
-                    + "/"
-                    + str(message.channel.id)
-                    + "/"
-                    + str(message.created_at.date())
-                    + ".json"
-                ):
+                #check if there's a json file with the message creation date as the name
+                if not os.path.exists(f"{message.guild.id}/{message.channel.id}/{message.created_at}.json"):
                     # if not create one
-                    with open(
-                        str(message.guild.id)
-                        + "/"
-                        + str(message.channel.id)
-                        + "/"
-                        + str(message.created_at.date())
-                        + ".json",
-                        "w",
-                    ) as f:
-                        # write the message data to the file
-                        json.dump(messageData, f, indent=4)
-                # if there's a json file with the date as it's name
+                    with open(f"{message.guild.id}/{message.channel.id}/{message.created_at}.json", "w") as f:
+                        # append the message data to the list
+                        messageDataList.append(messageData)
+                        # write the list to the json file
+                        json.dump(messageDataList, f)
                 else:
-                    # open the file
-                    with open(
-                        str(message.guild.id)
-                        + "/"
-                        + str(message.channel.id)
-                        + "/"
-                        + str(message.created_at.date())
-                        + ".json",
-                        "r",
-                    ) as f:
-                        # read the file
-                        data = json.load(f)
-                    # append the message data to the file
-                    data.append(messageData)
-                    # open the file
-                    with open(
-                        str(message.guild.id)
-                        + "/"
-                        + str(message.channel.id)
-                        + "/"
-                        + str(message.created_at.date())
-                        + ".json",
-                        "w",
-                    ) as f:
-                        # write the message data to the file
-                        json.dump(data, f, indent=4)
+                    # if there is a json file with the message creation date as the name
+                    with open(f"{message.guild.id}/{message.channel.id}/{message.created_at}.json", "r") as f:
+                        # read the json file
+                        messageDataList = json.load(f)
+                        # append the message data to the list
+                        messageDataList.append(messageData)
+                        # write the list to the json file
+                        json.dump(messageDataList, f)
 
     tjackphrases = [
         "Fett sunkigt att sitta och prata om droger men ok",
