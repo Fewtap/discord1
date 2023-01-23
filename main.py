@@ -495,6 +495,11 @@ async def playInjections():
                 # if the bot is in a voice channel with no members disconnect
                 await guild.voice_client.disconnect()
 
+bot.command()
+async def dc(ctx):
+    if ctx.guild.voice_client != None:
+        await ctx.guild.voice_client.disconnect()
+
 
 # run the bot
 bot.run(token)
