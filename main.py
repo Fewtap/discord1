@@ -267,9 +267,10 @@ async def on_message(message: discord.message.Message):
             await message.guild.voice_client.disconnect()
             return
     elif "!join" in message.content.lower():
-        if message.author in message.guild.voice_client.channel.members:
-            await message.channel.send("Jag är redan här!")
-            return
+        if message.guild.voice_client != None:
+            if message.author in message.guild.voice_client.channel.members:
+                await message.channel.send("Jag är redan här!")
+                return
         else:
             if message.guild.voice_client != None:
                 await message.guild.voice_client.disconnect()
