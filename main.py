@@ -393,6 +393,10 @@ async def on_message(message: discord.message.Message):
     elif "sås" in message.content.lower():
         phrase = random.choice(sauce)
         await message.reply(phrase)
+    #if bot and jävel is anywhere in the string or if bot and jävla is anywhere in the string
+    elif "jävel" in message.content.lower() or "jävla" in message.content.lower():
+        if "bot" in message.content.lower():
+            await message.reply("Tro du jag bryr mig?")
 
 
 # send a message to a specific channel every five minutes
