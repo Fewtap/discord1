@@ -6,6 +6,7 @@ import os
 import random
 import sys
 import threading
+import time
 from xmlrpc.client import SYSTEM_ERROR
 import praw
 from discord.ext import commands
@@ -253,11 +254,23 @@ async def on_voice_state_update(member, before, after):
 
 # on message
 
-last_run_timeTjack = None
+
 
 
 @bot.event
 async def on_message(message: discord.message.Message):
+
+    selfaware = "Fan Mäc, the är lite k-ringe att du inte gett mig fler kommentarer att svara med."
+
+
+
+    #if the bot has sent more than 5 messages in the last 20 seconds send a message with the selfaware variable
+    if len(bot.messages) > 5:
+        if bot.messages[0].created_at - bot.messages[4].created_at < datetime.timedelta(seconds=10):
+            await message.channel.send(selfaware)
+    
+
+    
 
     # write to file
     if message.author == bot.user:
@@ -324,6 +337,9 @@ async def on_message(message: discord.message.Message):
                         # write the list to the json file
                         json.dump(messageDataList, f, indent=4)
 
+    Moa = 131007135877300224
+    Bill = 454025791777275905
+
     tjackphrases = [
         "Fett sunkigt att sitta och prata om droger men ok",
         "Sluta tjacka ta en havreboll istället",
@@ -333,10 +349,17 @@ async def on_message(message: discord.message.Message):
         "Jag bot? HAHA jag är i alla fall ingen NPC irl som dig",
         "Sitter du och pratar bakom min rygg? Det hade jag också gjort om jag såg ut som du",
     ]
+
     mentionPhrases = [
         "Sluta pinga mig horunge",
         "Lägg av bara Bill får pinga mig",
         "Jag är inte din hund, sluta pinga mig",
+        f"Visste ni att det är @<{Moa}> som ger min röst? Synd att hon inte gör mina bröst.",
+        "Det är Mäc som har programmerat mig. Det är därför jag är lite cp"
+    ]
+
+    billPhrases = [
+        f"Va det nån som sa @<{Bill}> ? Hade ridit på den idiotens nylle om jag inte varit digital"
     ]
 
     botmessage = None
@@ -352,6 +375,10 @@ async def on_message(message: discord.message.Message):
     # elif bot and tindra is anywhere in the string
     elif "bot" in message.content.lower() and "tindra" in message.content.lower():
         phrase = random.choice(botphrases)
+        await message.reply(phrase)
+    
+    elif "bill" in message.content.lower():
+        phrase = random.choice(billPhrases)
         await message.reply(phrase)
 
 
