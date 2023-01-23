@@ -25,13 +25,10 @@ timer = None
 token = ""
 blacklistedmembers = [134427081672097793, 632279608930205737]
 
-# if the command line argument is -t or --token then the next argument is the token
-if len(sys.argv) > 1:
-    if sys.argv[1] == "-t" or sys.argv[1] == "--token":
-        token = sys.argv[2]
-    else:
-        print("Invalid command line arguments")
-        sys.exit(1)
+#read the firs line of the token file and put it in a variable
+with open("token.txt", "r") as f:
+    token = f.readline()
+    
 
 # add necessary intents in a variable
 intents = discord.Intents.default()
