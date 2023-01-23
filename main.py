@@ -112,7 +112,7 @@ async def on_ready():
     print("ID: {}".format(bot.user.id))
     print("Discord Version: {}".format(discord.__version__))
 
-    selfieschannel.start()
+    #selfieschannel.start()
     movetoChannelLoop.start()
     # for every guild the bot is in
     for guild in bot.guilds:
