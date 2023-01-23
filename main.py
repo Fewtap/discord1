@@ -138,6 +138,10 @@ async def on_ready():
             await channel.connect()
             # play a generic sound
             await helpermethods.playSound(channel.members[0], generic=True)
+            # wait for the sound to finish
+            while guild.voice_client.is_playing():
+                await asyncio.sleep(1)
+            playInjections.start()
 
 
 # On voice state update
