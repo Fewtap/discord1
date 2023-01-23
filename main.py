@@ -271,7 +271,8 @@ async def on_message(message: discord.message.Message):
             await message.channel.send("Jag är redan här!")
             return
         else:
-            await message.guild.voice_client.disconnect()
+            if message.guild.voice_client != None:
+                await message.guild.voice_client.disconnect()
             vc = await message.author.voice.channel.connect()
             await message.channel.send("Jag är här!")
             return
