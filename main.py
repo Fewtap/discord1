@@ -13,6 +13,7 @@ from discord.ext import commands
 import discord
 from discord.ext import tasks as discord_tasks
 import helpermethods
+import gatewayDiscord
 
 # init reddit
 reddit = praw.Reddit(
@@ -21,8 +22,7 @@ reddit = praw.Reddit(
     user_agent="your bot 0.1 by /u/your_bot",
 )
 
-mejmejs = True
-timer = None
+runTextFunctions = False
 token = ""
 blacklistedmembers = [134427081672097793, 632279608930205737]
 
@@ -134,13 +134,9 @@ async def on_ready():
                     await channel.guild.voice_client.disconnect()
                 if channel.members[0].id in blacklistedmembers:
                     return
-            # join the voice channel
-            await channel.connect()
+            
             # play a generic sound
-            await helpermethods.playSound(channel.members[0], generic=True)
-            # wait for the sound to finish
-            while guild.voice_client.is_playing():
-                await asyncio.sleep(1)
+            vc: discord.VoiceClient = await channel.connect()
             playInjections.start()
 
 
@@ -260,6 +256,9 @@ async def on_voice_state_update(member, before, after):
 
 @bot.event
 async def on_message(message: discord.message.Message):
+
+    if runTextFunctions == False:
+        return
 
     if "!dc" in message.content:
         if message.author in message.guild.voice_client.channel.members:
@@ -418,6 +417,8 @@ async def on_message(message: discord.message.Message):
 # send a message to a specific channel every five minutes
 @discord_tasks.loop(minutes=10)
 async def send_message():
+    if runTextFunctions == False:
+        return
     # get the channel
     channel = bot.get_channel(1065645686697246810)
     # get the 10 image posts from r/unket and put them in a list
@@ -444,6 +445,8 @@ async def send_message():
 # On message delete
 @bot.event
 async def on_message_delete(message):
+    if runTextFunctions == False:
+        return
     # if the message is from a bot do nothing
     if message.author.bot:
         return
@@ -462,6 +465,8 @@ async def on_message_delete(message):
 # On message edit
 @bot.event
 async def on_message_edit(before, after):
+    if runTextFunctions == False:
+        return
     # if the message is from a bot do nothing
     if before.author.bot:
         return

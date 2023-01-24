@@ -1,5 +1,6 @@
 # create a function to play a sound
 import asyncio
+import json
 import os
 import random
 import supabase
@@ -7,6 +8,7 @@ from discord.ext import commands
 import discord
 from discord.ext import tasks as discord_tasks
 from supabase import create_client, Client
+import websockets
 
 
 async def playSound(member, generic=False):
@@ -59,8 +61,61 @@ async def playSound(member, generic=False):
             await asyncio.sleep(1)
 
 
-async def UploadToDB(bot: commands.Bot):
-    url = ""
-    key = ""
+async def connectToWebsocket(bot, channel, token: str):
+    # connect to the websocket
+    await bot.wait_until_ready()
+    # get the channel
+    
+    # connect to the channel
+    vc: discord.VoiceClient = await channel.connect()
 
-    supabase: Client = create_client(url, key)
+    payload = {
+        "op": 0,
+        "d": {
+            "server_id": vc.guild.id,
+            "user_id": bot.user.id,
+            "session_id": vc.session_id,
+            "token": token
+        }
+    }
+
+    endpoint = vc.endpoint
+    endpoint = "wss://" + endpoint
+    
+
+    #Create a connection the websocket of the voice channel and send the payload and keep the connection open
+    async with websockets.connect(endpoint) as websocket:
+        await websocket.send(json.dumps(payload))
+        await websocket.send(json.dumps(
+            {
+                "op": 8,
+                "d": {
+                    "heartbeat_interval": 30000
+                }
+            }
+        ))
+        
+        while True:
+            #start a nnother thread to send a heartbeat every 30 seconds
+            asyncio.create_task(sendHeartbeat(websocket))
+            #if someone speaks in the voice channel print the user name of the person who spoke
+            data = await websocket.recv()
+            data = json.loads(data)
+            if data["op"] == 4:
+                user_id = data["d"]["user_id"]
+                user = vc.guild.get_member(user_id)
+                print(user.name)
+            
+
+                
+            
+            
+async def sendHeartbeat(websocket):
+    #send a heartbeat every 30 seconds
+    while True:
+        
+        await asyncio.sleep(30)
+
+
+
+    
