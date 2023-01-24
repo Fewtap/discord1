@@ -11,6 +11,7 @@ from supabase import create_client, Client
 import websockets
 
 
+
 async def playSound(member, generic=False):
 
     if generic == True:
@@ -61,60 +62,37 @@ async def playSound(member, generic=False):
             await asyncio.sleep(1)
 
 
-async def connectToWebsocket(bot, channel, token: str):
-    # connect to the websocket
-    await bot.wait_until_ready()
-    # get the channel
+async def memberLeaves(before, after, member, bot, blacklistedmembers):
+    # if there's no one left in the voice channel
+        if len(before.channel.members) == 1:
+            # if there's another channel with members in it, join the one with the most members in it, if there's only empty channels, disconnect
+            # get the voice channels the bot is in
+            voiceChannels = [
+                x
+                for x in before.channel.guild.channels
+                if type(x) == discord.channel.VoiceChannel
+            ]
+            # get the voice channel with the most members
+            channel = max(voiceChannels, key=lambda x: len(x.members))
+            # if the bot is in the voice channel with the most members
+            if bot.user in channel.members:
+                # disconnect
+                await before.channel.guild.voice_client.disconnect()
+            # if the bot is not in the voice channel with the most members
+            else:
+                # join the voice channel with the most members
+                vc = await channel.connect()
+                # play the sound
+                await playSound(member)
+                # wait for the sound to finish
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+        # if there's someone left in the voice channel
+        else:
+            # if member id is in blacklist do nothing
+            if member.id in blacklistedmembers:
+                return
     
-    # connect to the channel
-    vc: discord.VoiceClient = await channel.connect()
-
-    payload = {
-        "op": 0,
-        "d": {
-            "server_id": vc.guild.id,
-            "user_id": bot.user.id,
-            "session_id": vc.session_id,
-            "token": token
-        }
-    }
-
-    endpoint = vc.endpoint
-    endpoint = "wss://" + endpoint
-    
-
-    #Create a connection the websocket of the voice channel and send the payload and keep the connection open
-    async with websockets.connect(endpoint) as websocket:
-        await websocket.send(json.dumps(payload))
-        await websocket.send(json.dumps(
-            {
-                "op": 8,
-                "d": {
-                    "heartbeat_interval": 30000
-                }
-            }
-        ))
-        
-        while True:
-            #start a nnother thread to send a heartbeat every 30 seconds
-            asyncio.create_task(sendHeartbeat(websocket))
-            #if someone speaks in the voice channel print the user name of the person who spoke
-            data = await websocket.recv()
-            data = json.loads(data)
-            if data["op"] == 4:
-                user_id = data["d"]["user_id"]
-                user = vc.guild.get_member(user_id)
-                print(user.name)
-            
-
-                
-            
-            
-async def sendHeartbeat(websocket):
-    #send a heartbeat every 30 seconds
-    while True:
-        
-        await asyncio.sleep(30)
 
 
 
