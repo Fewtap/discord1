@@ -430,6 +430,15 @@ async def playInjections():
                     # if the bot is in a voice channel with no members disconnect
                     await guild.voice_client.disconnect()
 
+#on reaction add
+@bot.event
+async def on_reaction_add(reaction: discord.reaction.Reaction, user):
+    # if the reaction is not from a bot
+    if not user.bot:
+        message = reaction.message
+        message.add_reaction(reaction.emoji)
+        
+
 
 
 
