@@ -28,7 +28,8 @@ async def LogData(message: discord.Message):
             "guild": str(message.guild),
             "guild_id": str(message.guild.id),
             "created_at": message.created_at,
-            "attachment": str(message.attachments)
+            "attachment": str(message.attachments),
+            "embeds": str(message.embeds)
             
             
         }
@@ -48,6 +49,7 @@ async def DeleteMessage(message: discord.Message):
             "guild_id": str(message.guild.id),
             "created_at": message.created_at,
             "attachment": str(message.attachments),
+            "embeds": str(message.embeds)
             
             
         }
@@ -66,7 +68,9 @@ async def LogEdit(oldMessage: discord.Message, newMessage: discord.Message):
             "created_at": oldMessage.created_at,
             "attachment": str(oldMessage.attachments),
             "new_content": str(newMessage.content),
-            "old_content": str(oldMessage.content)
+            "old_content": str(oldMessage.content),
+            "old_embeds": str(oldMessage.embeds),
+            "new_embeds": str(newMessage.embeds)
             
             
         }
