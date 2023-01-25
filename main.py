@@ -383,11 +383,21 @@ async def on_message_delete(message):
 # On message edit
 @bot.event
 async def on_message_edit(before, after):
-    #loop through the variables in the before and after messages and print them
-    for var in before:
-        print(var)
-    for var in after:
-        print(var)
+    await firestoreclient.LogEdit(before, after)
+    # if the message is from a bot do nothing
+    if before.author.bot:
+        return
+    # if the message is not from a bot
+    else:
+        if config["runTextFunctions"]:
+            # send a message in the same channel as the edited message mentioning the author of the edited message and calling them out
+            botmessage = await before.channel.send(
+                "Hörrudu " + before.author.mention + ", jag såg det där!"
+            )
+            # delete the message after 5 seconds
+            await asyncio.sleep(5)
+            # delete all messages the bot has sent in the channel
+            await botmessage.delete()
 
 
 # loop every 3 to 5 minutes

@@ -1,4 +1,6 @@
+import datetime
 import json
+import threading
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -16,11 +18,6 @@ db: google.cloud.firestore.Client = firestore.client()
 
 async def LogData(message: discord.Message):
     documentid = str(message.id)
-    #create a dict with a list in it
-    
-    #add the attachments to the dict
-
-
     messageData = {
             
                 "author": str(message.author),
@@ -30,7 +27,7 @@ async def LogData(message: discord.Message):
             "channel_id": str(message.channel.id),
             "guild": str(message.guild),
             "guild_id": str(message.guild.id),
-            "created_at": str(message.created_at),
+            "created_at": message.created_at,
             "attachment": str(message.attachments)
             
             
@@ -39,8 +36,7 @@ async def LogData(message: discord.Message):
     db.collection(str(message.channel.id)).document(documentid).set(messageData)
 
 async def DeleteMessage(message: discord.Message):
-    documentid = str(message.id)
-    
+    documentid = str(message.id)   
     messageData = {
             
                 "author": str(message.author),
@@ -50,12 +46,31 @@ async def DeleteMessage(message: discord.Message):
             "channel_id": str(message.channel.id),
             "guild": str(message.guild),
             "guild_id": str(message.guild.id),
-            "created_at": str(message.created_at),
+            "created_at": message.created_at,
             "attachment": str(message.attachments),
             
             
         }
     db.collection("deletions").document(documentid).set(messageData)
-        
 
-    
+async def LogEdit(oldMessage: discord.Message, newMessage: discord.Message):
+    documentid = str(newMessage.id)
+    messageData = {
+            
+                "author": str(oldMessage.author),
+            "author_id": str(oldMessage.author.id),
+            "channel": str(oldMessage.channel),
+            "channel_id": str(oldMessage.channel.id),
+            "guild": str(oldMessage.guild),
+            "guild_id": str(oldMessage.guild.id),
+            "created_at": oldMessage.created_at,
+            "attachment": str(oldMessage.attachments),
+            "new_content": str(newMessage.content),
+            "old_content": str(oldMessage.content)
+            
+            
+        }
+    db.collection("edits").document(documentid).set(messageData)
+
+
+
