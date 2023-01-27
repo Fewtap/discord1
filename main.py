@@ -22,16 +22,16 @@ reddit = praw.Reddit(
     user_agent="your bot 0.1 by /u/your_bot",
 )
 config = {}
-#read the config.json file and put it in a variable
+# read the config.json file and put it in a variable
 with open("config.json", "r") as f:
     config = json.load(f)
 
 
-#read the firs line of the token file and put it in a variable
+# read the firs line of the token file and put it in a variable
 token = ""
 with open("token.txt", "r") as f:
     token = f.readline()
-    
+
 blacklistedmembers = config["blacklistedmembers"]
 
 # add necessary intents in a variable
@@ -116,7 +116,7 @@ async def on_ready():
     print("Discord Version: {}".format(discord.__version__))
 
     if config["runVoiceFunctions"]:
-        #selfieschannel.start()
+        # selfieschannel.start()
         movetoChannelLoop.start()
         # for every guild the bot is in
         for guild in bot.guilds:
@@ -138,7 +138,7 @@ async def on_ready():
                         await channel.guild.voice_client.disconnect()
                     if channel.members[0].id in blacklistedmembers:
                         return
-                
+
                 # play a generic sound
                 vc: discord.VoiceClient = await channel.connect()
                 playInjections.start()
@@ -162,12 +162,12 @@ async def on_voice_state_update(member, before, after):
 
     # if the member leaves a voice channel
     if before.channel != None and after.channel == None:
-        memberLeaves(before, after,member,bot,)
-        
-
-            
-
-    
+        memberLeaves(
+            before,
+            after,
+            member,
+            bot,
+        )
 
     # if the member joins a voice channel
     if before.channel == None and after.channel != None:
@@ -230,8 +230,6 @@ async def on_voice_state_update(member, before, after):
 # on message
 
 
-
-
 @bot.event
 async def on_message(message: discord.message.Message):
 
@@ -256,25 +254,10 @@ async def on_message(message: discord.message.Message):
             vc = await message.author.voice.channel.connect()
             await message.channel.send("Jag är här!")
             return
-        
-
-    
-            
-            
-    
-    
-
-    
 
     # write to file
     if message.author == bot.user:
         return
-
-    
-    
-    
-
-        
 
     Moa = 131007135877300224
     Bill = 454025791777275905
@@ -294,17 +277,14 @@ async def on_message(message: discord.message.Message):
         "Lägg av bara Bill får pinga mig",
         "Jag är inte din hund, sluta pinga mig",
         f"Visste ni att det är <@{Moa}> som ger min röst? Synd att hon inte gör mina bröst.",
-        "Det är Mäc som har programmerat mig. Det är därför jag är lite cp"
+        "Det är Mäc som har programmerat mig. Det är därför jag är lite cp",
     ]
 
     billPhrases = [
         f"Va det nån som sa <@{Bill}>? Hade ridit på den idiotens nylle om jag inte varit digital"
     ]
 
-    sauce = [
-        "Mmm... Sås...",
-        "Sås, my favourite"
-    ]
+    sauce = ["Mmm... Sås...", "Sås, my favourite"]
 
     botmessage = None
     if config["runTextFunctions"]:
@@ -320,14 +300,14 @@ async def on_message(message: discord.message.Message):
         elif "bot" in message.content.lower() and "tindra" in message.content.lower():
             phrase = random.choice(botphrases)
             await message.reply(phrase)
-        
+
         elif "bill" in message.content.lower():
             phrase = random.choice(billPhrases)
             await message.reply(phrase)
         elif "sås" in message.content.lower():
             phrase = random.choice(sauce)
             await message.reply(phrase)
-        #if bot and jävel is anywhere in the string or if bot and jävla is anywhere in the string
+        # if bot and jävel is anywhere in the string or if bot and jävla is anywhere in the string
         elif "jävel" in message.content.lower() or "jävla" in message.content.lower():
             if "bot" in message.content.lower():
                 await message.reply("Tro du jag bryr mig?")
@@ -336,7 +316,7 @@ async def on_message(message: discord.message.Message):
 # send a message to a specific channel every five minutes
 @discord_tasks.loop(minutes=10)
 async def send_message():
-    if config["runTextFunctions"]:    
+    if config["runTextFunctions"]:
         # get the channel
         channel = bot.get_channel(1065645686697246810)
         # get the 10 image posts from r/unket and put them in a list
@@ -383,7 +363,7 @@ async def on_message_delete(message):
 # On message edit
 @bot.event
 async def on_message_edit(before, after):
-    #loop through the variables in the before and after messages and print them
+    # loop through the variables in the before and after messages and print them
     for var in before:
         print(var)
     for var in after:
@@ -419,8 +399,6 @@ async def playInjections():
                 else:
                     # if the bot is in a voice channel with no members disconnect
                     await guild.voice_client.disconnect()
-
-
 
 
 # run the bot

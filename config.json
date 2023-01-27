@@ -1,5 +1,8 @@
 {
-"runVoiceFunctions": false,
-"runTextFunctions": false,
-"blacklistedmembers":[134427081672097793, 632279608930205737]
+    "runVoiceFunctions": true,
+    "runTextFunctions": false,
+    "blacklistedmembers": [
+        134427081672097793,
+        632279608930205737
+    ]
 }
